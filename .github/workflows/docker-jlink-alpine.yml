@@ -4,7 +4,7 @@
 # - build the docker image
 # - publish it to github
 
-name: Java CI with Docker
+name: Java CI with Docker Alpine
 
 on:
   push:
@@ -12,8 +12,8 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  IMAGE_NAME: jlink-img
-  PLATFORM: linux
+  IMAGE_NAME: jlink-img-alpine
+  PLATFORM: alpine
 
 jobs:
   build-jar:
@@ -42,6 +42,8 @@ jobs:
 
   # Building our runtime (only if new)
   build-jre:
+    env:
+      JAVA_TARGET: /opt/jdk/jdk-15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -51,16 +53,24 @@ jobs:
         with:
           path: custom-jre
           key: ${{ env.PLATFORM }}-${{ hashFiles('**/jlink-opts.txt') }}
-      - name: Set up JDK 1.14
+      # need to match target version for jlink to properly work, and alpine does not have 1.14 but 1.15
+      - run: curl -O https://download.java.net/java/early_access/jdk15/18/GPL/openjdk-15-ea+18_linux-x64_bin.tar.gz
+        if: steps.cache-runtime.outputs.cache-hit != 'true'
+      - name: Set up JDK 15
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         uses: actions/setup-java@v1
         with:
-          java-version: 1.14
+          java-version: 15
+          jdkFile: openjdk-15-ea+18_linux-x64_bin.tar.gz
+      # needed as Alpine is the platform we're targeting, different from the one we're building
+      - name: Get Alpine JDK
+        if: steps.cache-runtime.outputs.cache-hit != 'true'
+        run: |
+          wget https://download.java.net/java/early_access/alpine/10/binaries/openjdk-15-ea+10_linux-x64-musl_bin.tar.gz
+          mkdir -p /opt/jdk && tar -xzvf openjdk-15-ea+10_linux-x64-musl_bin.tar.gz -C /opt/jdk/
       - name: Create custom runtime
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         run: jlink @jlink-opts.txt
-        env:
-          JAVA_TARGET: ${{ env.JAVA_HOME }}
 
   push:
     # Ensure build job passes before pushing image.
@@ -85,7 +95,7 @@ jobs:
           key: ${{ env.PLATFORM }}-${{ hashFiles('**/jlink-opts.txt') }}
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag image
+        run: docker build . --file Dockerfile.alpine --tag image
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin

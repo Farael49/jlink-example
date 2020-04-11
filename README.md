@@ -61,6 +61,7 @@ $ jlink --module-path $JAVA_HOME/jmods \
 ## 4 - Wrap it up under a Github Action
 We'll build our JRE with the github actions, and ship it with our app in a docker image. 
 Our custom JRE is specific to an OS, our list of modules and additional options. We're using actions/cache in order to reuse a previously made JRE if these don't change. To properly cache it, the jlink options were put on a file (see jlink --save-opts) from which we get the hash. If the file change, the hash change, meaning we have to rebuild our runtime. 
+If targeting the same platform (linux here) the following works fine :
 ```
   build-jre:
     runs-on: ubuntu-latest
