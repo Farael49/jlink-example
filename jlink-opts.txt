@@ -1,2 +1,2 @@
-#Fri Apr 10 18:38:02 CEST 2020
---compress=2  --no-header-files --no-man-pages --strip-debug --module-path D:\jdk\jdk-14-linux\jmods  --add-modules java.base,java.logging,java.xml,java.sql,java.naming,java.desktop,java.management,java.instrument,java.security.jgss --output custom-jre
+#Fri Apr 11 04:31:17 CEST 2020
+--compress=2  --no-header-files --no-man-pages --strip-debug --module-path $JAVA_TARGET\jmods  --add-modules java.base,java.logging,java.xml,java.sql,java.naming,java.desktop,java.management,java.instrument,java.security.jgss --output custom-jre
