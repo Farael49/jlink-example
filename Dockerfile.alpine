@@ -1,4 +1,4 @@
-FROM alpine:3.11.5
+FROM alpine:3.13
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 ARG JAR_FILE=target/*.jar
