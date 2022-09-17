@@ -54,14 +54,12 @@ jobs:
         with:
           path: custom-jre
           key: ${{ env.PLATFORM }}-${{ hashFiles('**/jlink-opts.txt') }}
-      - run: curl -O https://download.oracle.com/java/17/archive/jdk-17.0.4.1_linux-x64_bin.tar.gz
-        if: steps.cache-runtime.outputs.cache-hit != 'true'
       - name: Set up JDK 17
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
-          jdkFile: jdk-17.0.4.1_linux-x64_bin.tar.gz
+            distribution: 'temurin'
+            java-version: '17'
       # needed as Alpine is the platform we're targeting, different from the one we're building
       - name: Get Alpine JDK
         if: steps.cache-runtime.outputs.cache-hit != 'true'
