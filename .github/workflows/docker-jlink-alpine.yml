@@ -21,11 +21,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up JDK 1.14
-        uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 1.14
+            distribution: 'temurin'
+            java-version: '17'
       - name: Cache Maven deps
         uses: actions/cache@v1
         with:
@@ -43,31 +44,30 @@ jobs:
   # Building our runtime (only if new)
   build-jre:
     env:
-      JAVA_TARGET: /opt/jdk/jdk-15
+      JAVA_TARGET: /opt/jdk/jdk-17
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Cache runtime
         id: cache-runtime
         uses: actions/cache@v1
         with:
           path: custom-jre
           key: ${{ env.PLATFORM }}-${{ hashFiles('**/jlink-opts.txt') }}
-      # need to match target version for jlink to properly work, and alpine does not have 1.14 but 1.15
-      - run: curl -O https://download.java.net/java/early_access/jdk15/18/GPL/openjdk-15-ea+18_linux-x64_bin.tar.gz
+      - run: curl -O https://download.oracle.com/java/17/archive/jdk-17.0.4.1_linux-x64_bin.tar.gz
         if: steps.cache-runtime.outputs.cache-hit != 'true'
-      - name: Set up JDK 15
+      - name: Set up JDK 17
         if: steps.cache-runtime.outputs.cache-hit != 'true'
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
-          java-version: 15
-          jdkFile: openjdk-15-ea+18_linux-x64_bin.tar.gz
+          java-version: 17
+          jdkFile: jdk-17.0.4.1_linux-x64_bin.tar.gz
       # needed as Alpine is the platform we're targeting, different from the one we're building
       - name: Get Alpine JDK
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         run: |
-          wget https://download.java.net/java/early_access/alpine/10/binaries/openjdk-15-ea+10_linux-x64-musl_bin.tar.gz
-          mkdir -p /opt/jdk && tar -xzvf openjdk-15-ea+10_linux-x64-musl_bin.tar.gz -C /opt/jdk/
+          wget https://download.java.net/java/early_access/alpine/14/binaries/openjdk-17-ea+14_linux-x64-musl_bin.tar.gz
+          mkdir -p /opt/jdk && tar -xzvf openjdk-17-ea+14_linux-x64-musl_bin.tar.gz -C /opt/jdk/
       - name: Create custom runtime
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         run: jlink @jlink-opts.txt
