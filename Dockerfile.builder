@@ -1,5 +1,5 @@
 #could use an openjdk alpine instead, but doing it manually can come handy
-FROM alpine:3.11.5 as build
+FROM alpine:3.13 as build
 RUN wget https://download.java.net/java/early_access/alpine/10/binaries/openjdk-15-ea+10_linux-x64-musl_bin.tar.gz
 RUN mkdir -p /opt/jdk && tar -xzvf openjdk-15-ea+10_linux-x64-musl_bin.tar.gz -C /opt/jdk/
 ENV JAVA_HOME=/opt/jdk/jdk-15
@@ -16,7 +16,7 @@ RUN sh mvnw -c dependency:go-offline
 COPY src src
 RUN sh mvnw -c clean package
 
-FROM alpine:3.11.5
+FROM alpine:3.13
 COPY --from=build /build/target/*.jar /app.jar
 COPY --from=build /custom-jre /opt/jdk/
 VOLUME /tmp
