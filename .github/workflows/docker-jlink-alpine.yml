@@ -66,8 +66,8 @@ jobs:
       - name: Get Alpine JDK
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         run: |
-          wget https://download.java.net/java/early_access/alpine/14/binaries/openjdk-17-ea+14_linux-x64-musl_bin.tar.gz
-          mkdir -p /opt/jdk && tar -xzvf openjdk-17-ea+14_linux-x64-musl_bin.tar.gz -C /opt/jdk/
+          wget https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jdk_x64_alpine-linux_hotspot_17.0.4.1_1.tar.gz
+          mkdir -p /opt/jdk && tar -xzvf OpenJDK17U-jdk_x64_alpine-linux_hotspot_17.0.4.1_1.tar.gz -C /opt/jdk/
       - name: Create custom runtime
         if: steps.cache-runtime.outputs.cache-hit != 'true'
         run: jlink @jlink-opts.txt
