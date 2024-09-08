@@ -1,5 +1,5 @@
 #could use an openjdk alpine instead, but doing it manually can come handy
-FROM alpine:3.16 as build
+FROM alpine:3.19.4 as build
 RUN wget https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.4.1%2B1/OpenJDK17U-jdk_x64_alpine-linux_hotspot_17.0.4.1_1.tar.gz
 RUN mkdir -p /opt/jdk && tar -xzvf OpenJDK17U-jdk_x64_alpine-linux_hotspot_17.0.4.1_1.tar.gz -C /opt/jdk/
 RUN mv /opt/jdk/jdk-17.0.4.1+1 /opt/jdk/jdk-17
@@ -17,7 +17,7 @@ RUN sh mvnw -c dependency:go-offline
 COPY src src
 RUN sh mvnw -c clean package
 
-FROM alpine:3.16
+FROM alpine:3.19.4
 COPY --from=build /build/target/*.jar /app.jar
 COPY --from=build /custom-jre /opt/jdk/
 VOLUME /tmp
